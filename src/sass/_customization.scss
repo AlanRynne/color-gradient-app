@@ -29,7 +29,6 @@ $colors: (
 
 // Links
 $link: $primary;
-$link-invert: $primary-invert;
 $link-focus-border: $primary;
 
 $widescreen-enabled: false;
@@ -41,10 +40,10 @@ $fullhd-enabled: false;
 @import "~animate.css";
 
 .smooth-enter-active {
-  animation: slideInRight .3s;
+  animation: fadeIn .3s linear;
 }
 
 .smooth-leave-active {
-  animation: slideOutRight .3s;
+  animation: none;
 }
 

@@ -1,6 +1,6 @@
 <template lang="pug">
   #home(ref="home" @mousemove="onMouseMove")
-    b-loading.custom-loading(:active="isLoading")
+    b-loading.custom-loading(:active="false")
     .hero.is-primary.is-fullheight
       .hero-bg
         svg(xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' :style="colorMap ? `background-color:${colorMap(0)}`: ''")
@@ -28,7 +28,7 @@
         .column.is-vcentered
           .container.has-text-centered
             h1.title.is-1.has-text-weight-normal.has-text-white.is-mouse-tracked.has-text-shadow(:style="`--shadow-dir:${-positionX*30}px;--position-y:${positionY};transform: rotateX(${positionY * 10}deg) rotateY(${-positionX*30}deg);`") Color Gradients!!
-            color-gradient(@update:colormap="onColorMapUpdated")
+            color-gradient(@update:colormap="onColorMapUpdated" :start.sync="start" :end.sync="end")
       .hero-foot
         nav.tabs.is-fullwidth.has-background-white
           .container.is-family-secondary
@@ -41,6 +41,7 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator'
 import ColorGradient from "@/components/ColorGradient.vue"
+import interpolate from "color-interpolate"
 
 function wait(seconds: number) {
   return new Promise((resolve) => {
@@ -53,13 +54,15 @@ function wait(seconds: number) {
 })
 export default class Home extends Vue {
 
-  private colorMap = (t: number) => '#ffffff'
   private circleCount = 24
   private positionX = 0.5
   private positionY = 0
   private container: HTMLElement | null = null
   private circleRange: number[] = []
   private isLoading = true
+  private start = this.randomColor()
+  private end = this.randomColor()
+  private colorMap = interpolate([this.start,this.end])
 
   async mounted() {
     this.container = this.$refs.home as HTMLElement
@@ -73,16 +76,6 @@ export default class Home extends Vue {
     window.removeEventListener('resize', this.handleResize)
   }
 
-  mouseOverCircle(e: MouseEvent) {
-    console.log('over circle', e.target)
-    const t = e.target as HTMLElement
-      t.setAttribute('opacity', '0.2')
-  }
-  mouseLeaveCircle(e: MouseEvent){
-    const t = e.target as HTMLElement
-    t.setAttribute('opacity', '1')
-
-  }
   ComputeCircleCount() {
     const cnt = this.container
     if (!cnt) return 25
@@ -113,6 +106,10 @@ export default class Home extends Vue {
 
   handleResize() {
     this.ComputeCircleCount()
+  }
+
+  randomColor() {
+    return '#' + Math.floor(Math.random() * 16777215).toString(16)
   }
 
 }
@@ -174,11 +171,6 @@ export default class Home extends Vue {
 }
 
 circle {
-  transition: all 2s !important;
-
-  &:hover {
-    transition: all .3s ease-out !important;
-    opacity: 0;
-  }
+  transition: all .2s !important;
 }
 </style>
