@@ -27,7 +27,7 @@
         .card-footer
           .card-footer-item
             b-tooltip(label="Color count" type="is-info")
-              b-numberinput(:min="2" :max="12" v-model="count" size="is-small" type="is-info")
+              b-numberinput(:min="2" :max="12" v-model="count" size="is-small" type="is-info" :editable="false")
     .copy-button
       b-dropdown(:mobile-modal="false" position="is-top-right" )
         button.button.is-white.has-shadow(slot="trigger" slot-scope="{active}")

@@ -1,5 +1,6 @@
 <template lang="pug">
-  #home(@mousemove="onMouseMove")
+  #home(ref="home" @mousemove="onMouseMove")
+    b-loading.custom-loading(:active="isLoading")
     .hero.is-primary.is-fullheight
       .hero-bg
         svg(xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' :style="colorMap ? `background-color:${colorMap(0)}`: ''")
@@ -41,6 +42,12 @@
 import {Component, Vue} from 'vue-property-decorator'
 import ColorGradient from "@/components/ColorGradient.vue"
 
+function wait(seconds: number) {
+  return new Promise((resolve)=> {
+    setTimeout(resolve,seconds)
+  })
+}
+
 @Component({
   components: {ColorGradient}
 })
@@ -52,11 +59,14 @@ export default class Home extends Vue {
   private positionY = 0
   private container: HTMLElement | null = null
   private circleRange: number[] = []
+  private isLoading = true
 
-  mounted() {
-    this.container = document.getElementById('home')
+  async mounted() {
+    this.container = this.$refs.home as HTMLElement
     this.ComputeCircleCount()
     window.addEventListener('resize', this.handleResize)
+    await wait(300)
+    this.isLoading = false
   }
 
   beforeDestroy() {
@@ -142,5 +152,13 @@ export default class Home extends Vue {
 
 .navbar-menu {
   background-color: transparent !important;
+}
+
+.loading-overlay.custom-loading{
+  .loading-background {
+    background-color: #ff9d00;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 1600 800'%3E%3Cg stroke='%23000' stroke-width='66.7' stroke-opacity='0.11' %3E%3Ccircle fill='%23ff9d00' cx='0' cy='0' r='1800'/%3E%3Ccircle fill='%23f27d00' cx='0' cy='0' r='1700'/%3E%3Ccircle fill='%23e55f00' cx='0' cy='0' r='1600'/%3E%3Ccircle fill='%23d84400' cx='0' cy='0' r='1500'/%3E%3Ccircle fill='%23cb2c00' cx='0' cy='0' r='1400'/%3E%3Ccircle fill='%23bf1600' cx='0' cy='0' r='1300'/%3E%3Ccircle fill='%23b20300' cx='0' cy='0' r='1200'/%3E%3Ccircle fill='%23a5000e' cx='0' cy='0' r='1100'/%3E%3Ccircle fill='%2398001c' cx='0' cy='0' r='1000'/%3E%3Ccircle fill='%238b0027' cx='0' cy='0' r='900'/%3E%3Ccircle fill='%237e0030' cx='0' cy='0' r='800'/%3E%3Ccircle fill='%23710037' cx='0' cy='0' r='700'/%3E%3Ccircle fill='%2364003b' cx='0' cy='0' r='600'/%3E%3Ccircle fill='%2358003c' cx='0' cy='0' r='500'/%3E%3Ccircle fill='%234b003a' cx='0' cy='0' r='400'/%3E%3Ccircle fill='%233e0037' cx='0' cy='0' r='300'/%3E%3Ccircle fill='%23310030' cx='0' cy='0' r='200'/%3E%3Ccircle fill='%23210024' cx='0' cy='0' r='100'/%3E%3C/g%3E%3C/svg%3E");
+    background-attachment: fixed;
+    background-size: cover;  }
 }
 </style>
