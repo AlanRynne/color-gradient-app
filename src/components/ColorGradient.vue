@@ -13,6 +13,8 @@
                       color-picker(v-model="startSync" @color:change="onStartColorChanged" :height="180" :width="180")
                 b-input(v-model="startSync" size="is-small")
           .card-footer-item
+            b-button.is-family-secondary(type="is-text" size="is-small" @click="$emit('randomize')") Randomize
+          .card-footer-item
             b-tooltip(label="End color" type="is-info" position="is-left")
               b-field
                 p.control

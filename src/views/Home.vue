@@ -28,7 +28,11 @@
         .column.is-vcentered
           .container.has-text-centered
             h1.title.is-1.has-text-weight-normal.has-text-white.is-mouse-tracked.has-text-shadow(:style="`--shadow-dir:${-positionX*30}px;--position-y:${positionY};transform: rotateX(${positionY * 10}deg) rotateY(${-positionX*30}deg);`") Color Gradients!!
-            color-gradient(@update:colormap="onColorMapUpdated" :start.sync="start" :end.sync="end")
+            color-gradient(
+              @update:colormap="onColorMapUpdated"
+              @randomize="randomizeColors"
+              :start.sync="start"
+              :end.sync="end")
       .hero-foot
         nav.tabs.is-fullwidth.has-background-white
           .container.is-family-secondary
@@ -110,6 +114,11 @@ export default class Home extends Vue {
 
   randomColor() {
     return '#' + Math.floor(Math.random() * 16777215).toString(16)
+  }
+
+  randomizeColors(){
+    this.start = this.randomColor()
+    this.end = this.randomColor()
   }
 
 }
