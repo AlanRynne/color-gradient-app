@@ -8,8 +8,8 @@
               v-for="i in circleRange"
               :key="i"
               :fill="colorMap ? colorMap(1-(i/(circleCount-1))): '#ffffff'"
-              cx='-300'
-              cy='-300'
+              cx='-150'
+              cy='0'
               :r='((circleCount+2) * 100)-(i+1)*100'
             )
       .hero-head.is-family-secondary
@@ -26,7 +26,7 @@
       .hero-body.columns
         .column.is-vcentered
           .container.has-text-centered
-            h1.title.is-1.has-text-weight-normal.has-text-white.is-mouse-tracked.has-text-shadow(:style="`transform: rotateX(${positionY * 10}deg) rotateY(${-positionX*30}deg);`") Color Gradients!!
+            h1.title.is-1.has-text-weight-normal.has-text-white.is-mouse-tracked.has-text-shadow(:style="`--shadow-dir:${-positionX*30}px;--position-y:${positionY};transform: rotateX(${positionY * 10}deg) rotateY(${-positionX*30}deg);`") Color Gradients!!
             color-gradient(@update:colormap="onColorMapUpdated")
       .hero-foot
         nav.tabs.is-fullwidth.has-background-white
@@ -66,8 +66,8 @@ export default class Home extends Vue {
   ComputeCircleCount() {
     const cnt = this.container
     if (!cnt) return 25
-    const height = cnt.clientHeight + 300
-    const width = cnt.clientWidth + 300
+    const height = cnt.clientHeight
+    const width = cnt.clientWidth + 150
     const diagDistance = Math.sqrt(height * height + width * width)
     const count = Math.ceil(diagDistance / 100)
     this.circleRange = this.range(0, count)
@@ -128,12 +128,12 @@ export default class Home extends Vue {
 }
 
 .has-text-shadow {
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.11),
-  0 2px 2px rgba(0, 0, 0, 0.11),
-  0 4px 4px rgba(0, 0, 0, 0.11),
-  0 8px 8px rgba(0, 0, 0, 0.11),
-  0 16px 16px rgba(0, 0, 0, 0.11),
-  0 32px 32px rgba(0, 0, 0, 0.11);
+  text-shadow: var(--shadow-dir) 1px 1px rgba(0, 0, 0, 0.11),
+  var(--shadow-dir) 2px 2px rgba(0, 0, 0, 0.11),
+  var(--shadow-dir) 4px 4px rgba(0, 0, 0, 0.11),
+  var(--shadow-dir) 8px 8px rgba(0, 0, 0, 0.11),
+  var(--shadow-dir) 16px 16px rgba(0, 0, 0, 0.11),
+  var(--shadow-dir) 32px 32px rgba(0, 0, 0, 0.11);
 }
 
 .tabs {
