@@ -34,9 +34,7 @@
             ul
               li
                 a(href="http://svgbackgrounds.com")
-                  span Original background by
-                  br
-                  span.has-text-weight-semibold  SvgBackgrounds.com
+                  span Original background by SvgBackgrounds.com
 </template>
 
 <script lang="ts">
