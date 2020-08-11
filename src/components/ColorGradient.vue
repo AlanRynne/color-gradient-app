@@ -23,8 +23,7 @@
                 b-input(v-model="endSync" size="is-small")
         .card-content.is-paddingless.columns.is-mobile.is-gapless.color-container
             .column.is-paddingless.color-box.has-background-white(v-if="colors.length == 0")
-            transition-group(name="smooth" tag="div" class="column columns is-paddingless")
-              .column.is-paddingless.color-box(v-for="color in colors" :key="color" :style="`background-color:${color}`")
+            .column.is-paddingless.color-box(v-for="color in colors" :key="color" :style="`background-color:${color}`")
         .card-footer
           .card-footer-item
             b-tooltip(label="Color count" type="is-info")
@@ -136,7 +135,6 @@ export default class ColorGradient extends Vue {
   justify-content: center;
   align-items: center;
   height: 100px;
-  background-color: #8c67ef;
 
   &:not(:last-child){
     margin-right: 2px;
