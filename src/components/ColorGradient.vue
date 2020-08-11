@@ -105,7 +105,6 @@ export default class ColorGradient extends Vue {
 
   @Watch('end')
   onEndColorChanged(value: any) {
-    console.log('end color changed', value)
     try {
       this.colorMap = interpolate([this.startSync, this.endSync])
       this.$emit('update:colormap', this.colorMap)
