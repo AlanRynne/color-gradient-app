@@ -1,0 +1,50 @@
+// Import Bulma's core
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,400;0,500;0,700;1,200;1,400;1,500;1,700&family=Shrikhand&display=swap');
+@import "~bulma/sass/utilities/_all";
+
+// Set your colors
+$primary: #6972e0;
+$info: #6972e0;
+$primary-invert: findColorInvert($primary);
+$twitter: #4099FF;
+$twitter-invert: findColorInvert($twitter);
+
+$family-primary: 'Shrikhand', cursive;
+$family-secondary: 'Raleway';
+$navbar-breakpoint: 0;
+
+// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+$colors: (
+        "white": ($white, $black),
+        "black": ($black, $white),
+        "light": ($light, $light-invert),
+        "dark": ($dark, $dark-invert),
+        "primary": ($primary, $primary-invert),
+        "info": ($info, $info-invert),
+        "success": ($success, $success-invert),
+        "warning": ($warning, $warning-invert),
+        "danger": ($danger, $danger-invert),
+        "twitter": ($twitter, $twitter-invert)
+);
+
+// Links
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
+
+$widescreen-enabled: false;
+$fullhd-enabled: false;
+
+// Import Bulma and Buefy styles
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
+@import "~animate.css";
+
+.smooth-enter-active {
+  animation: slideInRight .3s;
+}
+
+.smooth-leave-active {
+  animation: slideOutRight .3s;
+}
+
