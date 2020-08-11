@@ -4,7 +4,7 @@
       .card.has-shadow
         .card-header
           .card-footer-item
-            b-tooltip(label="Start color" type="is-info")
+            b-tooltip(label="Start color" type="is-info" position="is-left")
               b-field
                 p.control
                   b-dropdown(:mobile-modal="false" position="is-top-right")
@@ -13,7 +13,7 @@
                       color-picker(v-model="start" @color:change="onStartColorChanged" :height="180" :width="180")
                 b-input(v-model="start" size="is-small")
           .card-footer-item
-            b-tooltip(label="End color" type="is-info")
+            b-tooltip(label="End color" type="is-info" position="is-left")
               b-field
                 p.control
                   b-dropdown(:mobile-modal="false" position="is-top-right")
