@@ -56,13 +56,16 @@ import ColorPicker from 'vue-iro-color-picker'
 })
 export default class ColorGradient extends Vue {
   private count = 8
-  private start = '#ff214a'
-  private end = '#008ba3'
+  private start = this.randomColor()
+  private end = this.randomColor()
   private colorMap: (index: number) => string
       = interpolate([this.start, this.end])
 
   private startError = null
   private endError = null
+  randomColor() {
+    return '#'+Math.floor(Math.random() * 16777215).toString(16)
+  }
 
   private copyOptions = [
     {name: 'CSS'},
