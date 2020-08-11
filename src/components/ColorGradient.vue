@@ -24,7 +24,7 @@
         .card-content.is-paddingless.columns.is-mobile.is-gapless.color-container
             .column.is-paddingless.color-box.has-background-white(v-if="colors.length == 0")
             transition-group(name="smooth" tag="div" class="column columns is-paddingless")
-              .column.is-paddingless.color-box(v-for="(color, index) in colors" :key="index" :style="`background-color:${color}`")
+              .column.is-paddingless.color-box(v-for="color in colors" :key="color" :style="`background-color:${color}`")
         .card-footer
           .card-footer-item
             b-tooltip(label="Color count" type="is-info")
@@ -76,7 +76,7 @@ export default class ColorGradient extends Vue {
     return this.colors.join(',')
   }
 
-  onCopy(e: any) {
+  onCopy() {
     this.$buefy.notification.open({
       position: 'is-top-right',
       type: 'is-success',
@@ -84,7 +84,7 @@ export default class ColorGradient extends Vue {
     })
   }
 
-  onCopyError(e: any) {
+  onCopyError() {
     this.$buefy.notification.open({
       position: 'is-top-right',
       type: 'is-danger',

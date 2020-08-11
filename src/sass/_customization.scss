@@ -33,6 +33,8 @@ $link-focus-border: $primary;
 $widescreen-enabled: false;
 $fullhd-enabled: false;
 
+$loading-background: white;
+$loading-background-legacy: white;
 // Import Bulma and Buefy styles
 @import "~bulma";
 @import "~buefy/src/scss/buefy";

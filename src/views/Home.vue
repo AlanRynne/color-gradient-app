@@ -1,6 +1,6 @@
 <template lang="pug">
   #home(ref="home" @mousemove="onMouseMove")
-    b-loading.custom-loading(:active="false")
+    b-loading(:active="isLoading")
     .hero.is-primary.is-fullheight
       .hero-bg
         svg(xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' :style="colorMap ? `background-color:${colorMap(0)}`: ''")
@@ -62,7 +62,7 @@ export default class Home extends Vue {
   private isLoading = true
   private start = this.randomColor()
   private end = this.randomColor()
-  private colorMap = interpolate([this.start,this.end])
+  private colorMap = interpolate([this.start, this.end])
 
   async mounted() {
     this.container = this.$refs.home as HTMLElement
