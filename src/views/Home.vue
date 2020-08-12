@@ -31,8 +31,7 @@
             color-gradient(
               @update:colormap="onColorMapUpdated"
               @randomize="randomizeColors"
-              :start.sync="start"
-              :end.sync="end")
+              :palette="palette")
       .hero-foot
         nav.tabs.is-fullwidth.has-background-white
           .container.is-family-secondary
@@ -58,19 +57,16 @@ function wait(seconds: number) {
 })
 export default class Home extends Vue {
 
+  private isLoading = true
   private circleCount = 24
   private positionX = 0.5
   private positionY = 0
-  private container: HTMLElement | null = null
   private circleRange: number[] = []
-  private isLoading = true
-  private start = this.randomColor()
-  private end = this.randomColor()
-  private colorMap = interpolate([this.start, this.end])
+  private palette=[this.randomColor(), this.randomColor()]
+  private colorMap = interpolate(this.palette)
 
   async mounted() {
-    this.container = this.$refs.home as HTMLElement
-    this.ComputeCircleCount()
+    this.computeCircleCount()
     window.addEventListener('resize', this.handleResize)
     await wait(300)
     this.isLoading = false
@@ -80,8 +76,8 @@ export default class Home extends Vue {
     window.removeEventListener('resize', this.handleResize)
   }
 
-  ComputeCircleCount() {
-    const cnt = this.container
+  computeCircleCount() {
+    const cnt = this.$refs.home as HTMLElement
     if (!cnt) return 25
     const height = cnt.clientHeight
     const width = cnt.clientWidth + 150
@@ -109,7 +105,7 @@ export default class Home extends Vue {
   }
 
   handleResize() {
-    this.ComputeCircleCount()
+    this.computeCircleCount()
   }
 
   randomColor() {
@@ -117,8 +113,11 @@ export default class Home extends Vue {
   }
 
   randomizeColors(){
-    this.start = this.randomColor()
-    this.end = this.randomColor()
+    const temp = []
+    for (let i = 0; i < this.palette.length; i++){
+      temp.push(this.randomColor())
+    }
+    this.palette = temp
   }
 
 }

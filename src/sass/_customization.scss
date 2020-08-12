@@ -7,7 +7,8 @@ $info: #6972e0;
 $primary-invert: findColorInvert($primary);
 $twitter: #4099FF;
 $twitter-invert: findColorInvert($twitter);
-
+$gray: #969696;
+$gray-invert: findColorInvert($gray);
 $family-primary: 'Shrikhand', cursive;
 $family-secondary: 'Raleway';
 $navbar-breakpoint: 0;
@@ -23,7 +24,9 @@ $colors: (
         "success": ($success, $success-invert),
         "warning": ($warning, $warning-invert),
         "danger": ($danger, $danger-invert),
-        "twitter": ($twitter, $twitter-invert)
+        "twitter": ($twitter, $twitter-invert),
+        "gray": ($gray,$gray-invert)
+
 );
 
 // Links

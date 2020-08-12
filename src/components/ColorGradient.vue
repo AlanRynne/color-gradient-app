@@ -1,31 +1,24 @@
 <template lang='pug'>
   #color-gradient
+    .buttons.copy-button
+      b-button.is-family-secondary.has-shadow(type="is-white" icon-left="plus" @click="addColorToPalette" :disabled="palette.length > 4") Add color
+      b-button.is-family-secondary.has-shadow(type="is-white" icon-left="random" @click="$emit('randomize')") Randomize
     transition(name="smooth" mode="out-in")
       .card.has-shadow
         .card-header
-          .card-footer-item
-            b-tooltip(label="Start color" type="is-info" position="is-left")
-              b-field
-                p.control
-                  b-dropdown(:mobile-modal="false" position="is-top-right")
-                    button.button.is-small.preview-button(slot="trigger" :style="`--color: ${startSync}`")
-                    b-dropdown-item(custom)
-                      color-picker(v-model="startSync" @color:change="onStartColorChanged" :height="180" :width="180")
-                b-input(v-model="startSync" size="is-small")
-          .card-footer-item
-            b-button.is-family-secondary(type="is-text" size="is-small" @click="$emit('randomize')") Randomize
-          .card-footer-item
-            b-tooltip(label="End color" type="is-info" position="is-left")
-              b-field
-                p.control
-                  b-dropdown(:mobile-modal="false" position="is-top-right")
-                    button.button.is-small.preview-button(slot="trigger" :style="`--color: ${endSync}`")
-                    b-dropdown-item(custom)
-                      color-picker(v-model="endSync" @color:change="onEndColorChanged" :height="180" :width="180")
-                b-input(v-model="endSync" size="is-small")
+          .card-footer-item(v-for="(color, index) in paletteObjects" :key="index")
+            b-field
+              p.control
+                b-dropdown(:mobile-modal="false" position="is-top-right")
+                  button.button.is-small.preview-button(slot="trigger" :style="`--color: ${color.hex}`")
+                  b-dropdown-item(custom)
+                    color-picker(v-model="color.hex" @color:change="onColorChanged($event,index)" :height="180" :width="180")
+              b-input(v-model="color.hex" size="is-small")
+              p.control
+                b-button(type="is-gray" icon-left="trash" size="is-small" @click="removeColorAt(index)" :disabled="palette.length <= 2" outlined)
         .card-content.is-paddingless.columns.is-mobile.is-gapless.color-container
-            .column.is-paddingless.color-box.has-background-white(v-if="colors.length == 0")
-            .column.is-paddingless.color-box(v-for="color in colors" :key="color" :style="`background-color:${color}`")
+          .column.is-paddingless.color-box.has-background-white(v-if="colors.length == 0")
+          .column.is-paddingless.color-box(v-for="(color,index) in colors" :key="index" :style="`background-color:${color}`")
         .card-footer
           .card-footer-item
             b-tooltip(label="Color count" type="is-info")
@@ -58,13 +51,59 @@ import ColorPicker from 'vue-iro-color-picker'
 })
 export default class ColorGradient extends Vue {
 
-  private count = 8
-  @PropSync('start') private startSync!: string
-  @PropSync('end') private endSync!: string
+  @PropSync('palette') private paletteSync!: string[]
 
+  private count = 8
+  private paletteObjects: any[] = []
   private colorMap: any = null
-  private startError = null
-  private endError = null
+
+  @Watch('palette', {immediate: false, deep: false})
+  onPaletteChanged(oldVal: string[], newVal: string[]) {
+    this.updatePaletteObjects()
+  }
+
+
+  randomColor() {
+    return '#' + Math.floor(Math.random() * 16777215).toString(16)
+  }
+
+  addColorToPalette() {
+    this.paletteSync.push(this.randomColor())
+    this.updatePaletteObjects()
+  }
+
+  mounted() {
+    this.updatePaletteObjects()
+  }
+
+  get colors() {
+    const gradient: any[] = []
+    if (this.colorMap === null) return gradient
+    for (let i = 0; i < this.count; i++) {
+      const color = this.colorMap(i / (this.count - 1))
+      gradient.push(color)
+    }
+    return gradient
+  }
+
+  updatePaletteObjects() {
+    this.colorMap = interpolate(this.paletteSync)
+    this.$emit('update:colormap', this.colorMap)
+    this.paletteObjects = this.paletteSync.map((color: string) => {
+      return {
+        hex: color
+      }
+    })
+  }
+
+  onColorChanged(value: any, index: number) {
+    this.paletteSync[index] = value.color.hexString
+    this.updatePaletteObjects()
+  }
+
+  removeColorAt(index: number) {
+    this.paletteSync.splice(index, 1)
+  }
 
   private copyOptions = [
     {name: 'CSS'},
@@ -92,38 +131,6 @@ export default class ColorGradient extends Vue {
       message: `Unable to copy gradient`
     })
   }
-
-  @Watch('start')
-  onStartColorChanged(value: any) {
-    try {
-      this.colorMap = interpolate([this.startSync, this.endSync])
-      this.$emit('update:colormap', this.colorMap)
-      this.startSync = value.color.hexString
-    } catch (err) {
-      this.startError = err
-    }
-  }
-
-  @Watch('end')
-  onEndColorChanged(value: any) {
-    try {
-      this.colorMap = interpolate([this.startSync, this.endSync])
-      this.$emit('update:colormap', this.colorMap)
-      this.endSync = value.color.hexString
-    } catch (err) {
-      this.endError = err
-    }
-  }
-
-  get colors() {
-    const gradient: any[] = []
-    if(this.colorMap === null) return gradient;
-    for (let i = 0; i < this.count; i++) {
-      const color = this.colorMap(i / (this.count - 1))
-      gradient.push(color)
-    }
-    return gradient
-  }
 }
 </script>
 
@@ -133,12 +140,13 @@ export default class ColorGradient extends Vue {
 }
 
 .color-box {
+  transition: background-color .1s;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100px;
 
-  &:not(:last-child){
+  &:not(:last-child) {
     margin-right: 2px;
   }
 }
@@ -161,6 +169,8 @@ export default class ColorGradient extends Vue {
 
 .copy-button {
   margin: 1em;
+  align-items: center;
+  justify-content: center;
 }
 
 .has-shadow {
