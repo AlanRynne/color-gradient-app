@@ -17,6 +17,7 @@
     "color-interpolate": "^1.0.5",
     "core-js": "^3.6.5",
     "register-service-worker": "^1.7.1",
+    "rgb-hex": "^3.0.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-clipboard2": "^0.3.1",

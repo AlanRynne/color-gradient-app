@@ -3,28 +3,48 @@
     .buttons.copy-button
       b-button.is-family-secondary.has-text-weight-semibold.has-shadow(type="is-white" size="is-small" icon-left="plus" @click="addColorToPalette" :disabled="palette.length > 4" rounded) Add color
       b-button.is-family-secondary.has-text-weight-semibold.has-shadow(type="is-white" size="is-small" icon-left="random" @click="$emit('randomize')" rounded) Randomize
-    transition(name="smooth" mode="out-in")
-      .card.has-shadow
-        .card-header
-          .card-footer-item(v-for="(color, index) in paletteObjects" :key="index")
-            b-field(addons)
-              p.control
-                b-dropdown(:mobile-modal="false" position="is-top-right")
-                  button.button.is-rounded.is-small.preview-button(slot="trigger" :style="`--color: ${color.hex}`")
-                    b-icon(icon="palette" type="is-white")
-                  b-dropdown-item(custom)
-                    color-picker(v-model="color.hex" @color:change="onColorChanged($event,index)" :height="180" :width="180")
-              b-input(v-model="color.hex" size="is-small" rounded custom-class="is-family-secondary has-text-weight-semibold" )
-              p.control(v-if="palette.length > 2")
-                b-button(type="is-gray" icon-left="trash" size="is-small" @click="removeColorAt(index)" :disabled="palette.length <= 2" outlined rounded)
-        .card-content.is-paddingless.columns.is-mobile.is-gapless.color-container
-          .column.is-paddingless.color-box.has-background-white(v-if="colors.length == 0")
-          .column.is-paddingless.color-box(v-for="(color,index) in colors" :key="index" :style="`background-color:${color}`")
-        .card-footer
-          .card-footer-item
-            b-tooltip(label="Color count" type="is-black" position="is-left")
-              b-numberinput(:min="2" :max="36" v-model="count" size="is-small" type="is-gray" :editable="false" custom-class="is-family-secondary has-text-weight-semibold" rounded controls-rounded)
-    .copy-button
+    .card.has-shadow
+      .card-header
+        .card-footer-item(v-for="(color, index) in paletteObjects" :key="index")
+          b-field(addons)
+            p.control
+              b-dropdown(:mobile-modal="false" position="is-top-right")
+                button.button.is-rounded.is-small.preview-button(slot="trigger" :style="`--color: ${color.hex}`")
+                  b-icon(icon="palette" type="is-white")
+                b-dropdown-item(custom)
+                  color-picker(v-model="color.hex" @color:change="onColorChanged($event,index)" :height="180" :width="180")
+            b-input(v-model="color.hex" size="is-small" rounded custom-class="is-family-secondary has-text-weight-semibold" )
+            p.control(v-if="palette.length > 2")
+              b-button(icon-left="trash" size="is-small" @click="removeColorAt(index)" :disabled="palette.length <= 2" outlined rounded)
+      .card-content.is-paddingless.columns.is-mobile.is-gapless.color-container
+        .column.is-paddingless.color-box.has-background-white(v-if="colors.length == 0")
+        .column.is-paddingless.color-box.is-family-code(
+          v-for="(color,index) in colors"
+          :class="showColorNames? 'show-names': ''"
+          :key="index"
+          :style="`--text-rotation: -90deg; background-color:${color}`"
+          :data-color="color",
+          v-clipboard:copy="color"
+          v-clipboard:success="onCopyColor"
+          v-clipboard:error="onCopyColorError"
+        )
+      .card-footer
+        .card-footer-item.card-buttons
+          b-tooltip.is-family-secondary(label="Show color codes" position="is-right" size="is-small" type="is-dark" animated)
+            b-button.is-family-secondary.has-text-weight-semibold(:hovered="showColorNames" type="is-small" icon-left="eye" @click="showColorNames = !showColorNames" rounded)
+          b-tooltip.is-family-secondary(label="Color count" position="is-left" size="is-small" type="is-dark" animated)
+            b-numberinput(
+              :min="2"
+              :max="36"
+              v-model="count"
+              size="is-small"
+              type="is-link"
+              :editable="false"
+              custom-class="is-family-secondary has-text-weight-semibold"
+              controls-position="compact"
+              rounded
+              controls-rounded)
+    .buttons.copy-button
       b-dropdown(:mobile-modal="false" position="is-top-right" )
         button.is-family-secondary.has-text-weight-semibold.button.is-white.is-small.is-rounded.has-shadow(slot="trigger" slot-scope="{active}")
           span Copy as...
@@ -42,6 +62,7 @@
 <script lang="ts">
 import {Component, Vue, Watch, PropSync} from 'vue-property-decorator'
 import interpolate from 'color-interpolate'
+import rgbHex from "rgb-hex"
 
 //eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 //@ts-ignore
@@ -53,12 +74,12 @@ import ColorPicker from 'vue-iro-color-picker'
 export default class ColorGradient extends Vue {
 
   @PropSync('palette') private paletteSync!: string[]
-
-  private count = 8
+  private showColorNames = false
+  private count = 11
   private paletteObjects: any[] = []
   private colorMap: any = null
 
-  @Watch('palette', {immediate: false, deep: false})
+  @Watch('palette')
   onPaletteChanged(oldVal: string[], newVal: string[]) {
     this.updatePaletteObjects()
   }
@@ -82,7 +103,7 @@ export default class ColorGradient extends Vue {
     if (this.colorMap === null) return gradient
     for (let i = 0; i < this.count; i++) {
       const color = this.colorMap(i / (this.count - 1))
-      gradient.push(color)
+      gradient.push('#' + rgbHex(color))
     }
     return gradient
   }
@@ -118,7 +139,7 @@ export default class ColorGradient extends Vue {
   }
 
   onCopy() {
-    this.$buefy.notification.open({
+    this.$buefy.snackbar.open({
       position: 'is-top-right',
       type: 'is-success',
       message: `Succesfully copied gradient`
@@ -126,34 +147,134 @@ export default class ColorGradient extends Vue {
   }
 
   onCopyError() {
-    this.$buefy.notification.open({
+    this.$buefy.snackbar.open({
       position: 'is-top-right',
       type: 'is-danger',
+      queue: false,
       message: `Unable to copy gradient`
+    })
+  }
+
+  onCopyColor(val: any) {
+    this.$buefy.snackbar.open({
+      position: 'is-top-right',
+      type: 'is-success',
+      queue: false,
+      message: `Succesfully copied color ${val.text}`
+    })
+  }
+
+  onCopyColorError() {
+    this.$buefy.snackbar.open({
+      position: 'is-top-right',
+      type: 'is-danger',
+      message: `Unable to copy color`
     })
   }
 }
 </script>
 
 <style lang='scss' scoped>
+
+@function powerNumber($number, $exp) {
+  $value: 1;
+  @if $exp > 0 {
+    @for $i from 1 through $exp {
+      $value: $value * $number
+    }
+  } @else if $exp < 0 {
+    @for $i from 1 through - $exp {
+      $value: $value / $number;
+    }
+  }
+  @return $value
+}
+
+@function colorLuminance($color) {
+  @if type-of($color) != 'color' {
+    @return 0.55
+  }
+  $color-rgb: ('red': red($color), 'green': green($color), 'blue': blue($color));
+  @each $name, $value in $color-rgb {
+    $adjusted: 0;
+    $value: $value / 255;
+    @if $value < 0.03928 {
+      $value: $value / 12.92;
+    } @else {
+      $value: ($value + .055) / 1.055;
+      $value: powerNumber($value, 2);
+    }
+    $color-rgb: map-merge($color-rgb, ($name:$value))
+  }
+  @return (map-get($color-rgb, 'red') * .2126) + (map-get($color-rgb, 'green') * .7152) + (map-get($color-rgb, 'blue') * .0722)
+}
+
+
+@function findColorInvert($color) {
+  @if (colorLuminance($color) > 0.55) {
+    @return rgba(#000, 0.7)
+  } @else {
+    @return #fff
+  }
+}
+
 .card {
   border-radius: 10px;
 }
 
 .color-box {
+  position: relative;
   transition: background-color .1s;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100px;
+  overflow: hidden;
+
+  &.show-names {
+    &::after {
+      opacity: 1 !important;
+    }
+  }
+
+  &::after {
+    $color: attr(data-color);
+    opacity: 0;
+    transition: opacity 1s;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    content: attr(data-color);
+    color: findColorInvert($color);
+    width: 100%;
+    height: 100%;
+    text-transform: uppercase;
+    transform: rotate(var(--text-rotation));
+    font-weight: bold;
+  }
 
   &:not(:last-child) {
     margin-right: 2px;
+  }
+
+  &:hover {
+    &::after {
+      opacity: 1;
+      transition: all .5s;
+    }
   }
 }
 
 .columns {
   margin-bottom: 0 !important;
+}
+
+.card-buttons {
+  *:not(:last-child) {
+    margin-right: auto;
+    margin-right: auto;
+  }
 }
 
 .color-container {

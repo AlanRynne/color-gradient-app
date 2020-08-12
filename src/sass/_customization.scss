@@ -44,10 +44,10 @@ $loading-background-legacy: white;
 @import "~animate.css";
 
 .smooth-enter-active {
-  animation: fadeIn .3s linear;
+  animation: fadeIn .3s;
 }
 
 .smooth-leave-active {
-  animation: none;
+  animation: fadeOut .3s;
 }
 
