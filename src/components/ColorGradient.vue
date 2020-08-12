@@ -1,8 +1,8 @@
 <template lang='pug'>
   #color-gradient
     .buttons.copy-button
-      b-button.is-family-secondary.has-shadow(type="is-white" icon-left="plus" @click="addColorToPalette" :disabled="palette.length > 4") Add color
-      b-button.is-family-secondary.has-shadow(type="is-white" icon-left="random" @click="$emit('randomize')") Randomize
+      b-button.is-family-secondary.has-shadow(type="is-white" size="is-small" icon-left="plus" @click="addColorToPalette" :disabled="palette.length > 4" rounded) Add color
+      b-button.is-family-secondary.has-shadow(type="is-white" size="is-small" icon-left="random" @click="$emit('randomize')" rounded) Randomize
     transition(name="smooth" mode="out-in")
       .card.has-shadow
         .card-header
@@ -25,7 +25,7 @@
               b-numberinput(:min="2" :max="36" v-model="count" size="is-small" type="is-info" :editable="false")
     .copy-button
       b-dropdown(:mobile-modal="false" position="is-top-right" )
-        button.button.is-white.has-shadow(slot="trigger" slot-scope="{active}")
+        button.button.is-white.is-small.is-rounded.has-shadow(slot="trigger" slot-scope="{active}")
           span Copy as...
           b-icon(:icon="active? 'chevron-up' : 'chevron-down'" size="is-small")
         b-dropdown-item(
