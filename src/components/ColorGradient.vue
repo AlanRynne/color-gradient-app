@@ -142,6 +142,7 @@ export default class ColorGradient extends Vue {
     this.$buefy.snackbar.open({
       position: 'is-top-right',
       type: 'is-success',
+      queue: false,
       message: `Succesfully copied gradient`
     })
   }
@@ -168,6 +169,7 @@ export default class ColorGradient extends Vue {
     this.$buefy.snackbar.open({
       position: 'is-top-right',
       type: 'is-danger',
+      queue: false,
       message: `Unable to copy color`
     })
   }
@@ -175,48 +177,6 @@ export default class ColorGradient extends Vue {
 </script>
 
 <style lang='scss' scoped>
-
-@function powerNumber($number, $exp) {
-  $value: 1;
-  @if $exp > 0 {
-    @for $i from 1 through $exp {
-      $value: $value * $number
-    }
-  } @else if $exp < 0 {
-    @for $i from 1 through - $exp {
-      $value: $value / $number;
-    }
-  }
-  @return $value
-}
-
-@function colorLuminance($color) {
-  @if type-of($color) != 'color' {
-    @return 0.55
-  }
-  $color-rgb: ('red': red($color), 'green': green($color), 'blue': blue($color));
-  @each $name, $value in $color-rgb {
-    $adjusted: 0;
-    $value: $value / 255;
-    @if $value < 0.03928 {
-      $value: $value / 12.92;
-    } @else {
-      $value: ($value + .055) / 1.055;
-      $value: powerNumber($value, 2);
-    }
-    $color-rgb: map-merge($color-rgb, ($name:$value))
-  }
-  @return (map-get($color-rgb, 'red') * .2126) + (map-get($color-rgb, 'green') * .7152) + (map-get($color-rgb, 'blue') * .0722)
-}
-
-
-@function findColorInvert($color) {
-  @if (colorLuminance($color) > 0.55) {
-    @return rgba(#000, 0.7)
-  } @else {
-    @return #fff
-  }
-}
 
 .card {
   border-radius: 10px;
@@ -240,13 +200,12 @@ export default class ColorGradient extends Vue {
   &::after {
     $color: attr(data-color);
     opacity: 0;
-    transition: opacity 1s;
-    position: absolute;
+    transition: all 1s;
     display: flex;
     justify-content: center;
     align-items: center;
     content: attr(data-color);
-    color: findColorInvert($color);
+    color: white;
     width: 100%;
     height: 100%;
     text-transform: uppercase;
@@ -261,7 +220,9 @@ export default class ColorGradient extends Vue {
   &:hover {
     &::after {
       opacity: 1;
-      transition: all .5s;
+      transition: all .3s;
+      transform: rotate(var(--text-rotation)) scale(1.1);
+      transform-origin: center;
     }
   }
 }
