@@ -21,4 +21,9 @@
   margin-right: auto;
   margin-left: 0;
 }
+
+.button:focus:not(.active) {
+  outline: none !important;
+  box-shadow: none !important;
+}
 </style>

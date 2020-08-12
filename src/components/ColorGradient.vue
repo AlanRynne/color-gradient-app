@@ -1,34 +1,35 @@
 <template lang='pug'>
   #color-gradient
     .buttons.copy-button
-      b-button.is-family-secondary.has-shadow(type="is-white" size="is-small" icon-left="plus" @click="addColorToPalette" :disabled="palette.length > 4" rounded) Add color
-      b-button.is-family-secondary.has-shadow(type="is-white" size="is-small" icon-left="random" @click="$emit('randomize')" rounded) Randomize
+      b-button.is-family-secondary.has-text-weight-semibold.has-shadow(type="is-white" size="is-small" icon-left="plus" @click="addColorToPalette" :disabled="palette.length > 4" rounded) Add color
+      b-button.is-family-secondary.has-text-weight-semibold.has-shadow(type="is-white" size="is-small" icon-left="random" @click="$emit('randomize')" rounded) Randomize
     transition(name="smooth" mode="out-in")
       .card.has-shadow
         .card-header
           .card-footer-item(v-for="(color, index) in paletteObjects" :key="index")
-            b-field
+            b-field(addons)
               p.control
                 b-dropdown(:mobile-modal="false" position="is-top-right")
-                  button.button.is-small.preview-button(slot="trigger" :style="`--color: ${color.hex}`")
+                  button.button.is-rounded.is-small.preview-button(slot="trigger" :style="`--color: ${color.hex}`")
+                    b-icon(icon="palette" type="is-white")
                   b-dropdown-item(custom)
                     color-picker(v-model="color.hex" @color:change="onColorChanged($event,index)" :height="180" :width="180")
-              b-input(v-model="color.hex" size="is-small")
-              p.control
-                b-button(type="is-gray" icon-left="trash" size="is-small" @click="removeColorAt(index)" :disabled="palette.length <= 2" outlined)
+              b-input(v-model="color.hex" size="is-small" rounded custom-class="is-family-secondary has-text-weight-semibold" )
+              p.control(v-if="palette.length > 2")
+                b-button(type="is-gray" icon-left="trash" size="is-small" @click="removeColorAt(index)" :disabled="palette.length <= 2" outlined rounded)
         .card-content.is-paddingless.columns.is-mobile.is-gapless.color-container
           .column.is-paddingless.color-box.has-background-white(v-if="colors.length == 0")
           .column.is-paddingless.color-box(v-for="(color,index) in colors" :key="index" :style="`background-color:${color}`")
         .card-footer
           .card-footer-item
-            b-tooltip(label="Color count" type="is-info")
-              b-numberinput(:min="2" :max="36" v-model="count" size="is-small" type="is-info" :editable="false")
+            b-tooltip(label="Color count" type="is-black" position="is-left")
+              b-numberinput(:min="2" :max="36" v-model="count" size="is-small" type="is-gray" :editable="false" custom-class="is-family-secondary has-text-weight-semibold" rounded controls-rounded)
     .copy-button
       b-dropdown(:mobile-modal="false" position="is-top-right" )
-        button.button.is-white.is-small.is-rounded.has-shadow(slot="trigger" slot-scope="{active}")
+        button.is-family-secondary.has-text-weight-semibold.button.is-white.is-small.is-rounded.has-shadow(slot="trigger" slot-scope="{active}")
           span Copy as...
           b-icon(:icon="active? 'chevron-up' : 'chevron-down'" size="is-small")
-        b-dropdown-item(
+        b-dropdown-item.is-family-secondary(
           v-for="(option, index) in copyOptions"
           :key="index" aria-role="listitem"
           v-clipboard:copy="translate(option.name)"
