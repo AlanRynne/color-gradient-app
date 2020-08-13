@@ -40,7 +40,7 @@ import {wait} from "@/utilities"
 @Component
 export default class App extends Vue {
   private isLoading = true
-  private changeActive = false
+  private changeActive = true
   private progress = 0
   private time = 0
   private size = {
