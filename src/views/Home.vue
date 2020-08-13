@@ -1,21 +1,15 @@
 <template lang="pug">
-  #home.columns(ref="home")
-    .column.is-vcentered
-      .container.has-text-centered
-        h1.title.is-1.has-text-weight-normal.has-text-white.is-mouse-tracked.has-text-shadow(
-          :style="`--shadow-dir:${-positionX*30}px;--position-y:${positionY};transform: rotateX(${positionY * 10}deg) rotateY(${-positionX*30}deg);`"
-        ) Color Gradients!!
-        color-gradient(
-          @update:colormap="onColorMapUpdated"
-          @randomize="randomizeColors"
-          :palette="palette")
+  #home(ref="home")
+    .container.has-text-centered
+      h1.title.is-1.has-text-weight-normal.has-text-white.is-mouse-tracked.has-text-shadow(
+        :style="`--shadow-dir:${-positionX*30}px;--position-y:${positionY};transform: rotateX(${positionY * 10}deg) rotateY(${-positionX*30}deg);`"
+      ) Color Gradients!!
+      color-gradient()
 </template>
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator'
 import ColorGradient from "@/components/ColorGradient.vue"
-import interpolate from "color-interpolate"
-
 
 @Component({
   components: {ColorGradient}
@@ -23,10 +17,8 @@ import interpolate from "color-interpolate"
 export default class Home extends Vue {
   private positionX = 0.5
   private positionY = 0
-  private palette = [this.randomColor(), this.randomColor()]
-  private colorMap = interpolate(this.palette)
 
-  async mounted() {
+  beforeMount() {
     window.addEventListener('mousemove', this.onMouseMove)
   }
 
@@ -34,42 +26,17 @@ export default class Home extends Vue {
     window.removeEventListener('mousemove', this.onMouseMove)
   }
 
-  onColorMapUpdated(colorMap: any) {
-    this.colorMap = colorMap
-    this.$emit('colormap', colorMap)
-  }
-
-  range(lowEnd: number, highEnd: number) {
-    const list = []
-    for (let i = lowEnd; i <= highEnd; i++) {
-      list.push(i)
-    }
-    return list
-  }
-
   onMouseMove(e: MouseEvent) {
     this.positionX = (e.pageX / window.innerWidth) - 0.5
     this.positionY = (e.pageY / window.innerHeight)
-  }
-
-  randomColor() {
-    return '#' + Math.floor(Math.random() * 16777215).toString(16)
-  }
-
-  randomizeColors() {
-    const temp = []
-    const count = Math.floor((Math.random() * 4) + 2);
-    for (let i = 0; i < count; i++) {
-      temp.push(this.randomColor())
-    }
-    this.palette = temp
   }
 }
 </script>
 
 <style lang="scss">
 #home {
-  width: 100%
+  width: 100%;
+  max-width: 100vw !important;
 }
 
 #i-like-food {

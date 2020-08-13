@@ -2,7 +2,7 @@
   #about.columns
     .column.is-vcentered
       .container.has-text-centered
-        p HI!!!
+        p SXXX
 </template>
 
 <script lang="ts">
@@ -10,6 +10,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 @Component
 export default class About extends Vue {
+  private showLogo = true
 }
 </script>
 

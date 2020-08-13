@@ -2,7 +2,7 @@
   #color-gradient
     .buttons.copy-button
       b-button.is-family-secondary.has-text-weight-semibold.has-shadow(type="is-white" size="is-small" icon-left="plus" @click="addColorToPalette" :disabled="palette.length > 4" rounded) Add color
-      b-button.is-family-secondary.has-text-weight-semibold.has-shadow(type="is-white" size="is-small" icon-left="random" @click="$emit('randomize')" rounded) Randomize
+      b-button.is-family-secondary.has-text-weight-semibold.has-shadow(type="is-white" size="is-small" icon-left="random" @click="$store.commit('randomizePalette')" rounded) Randomize
     .card.has-shadow
       .card-header
         .card-footer-item(v-for="(color, index) in paletteObjects" :key="index")
@@ -60,42 +60,42 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue, Watch, PropSync} from 'vue-property-decorator'
-import interpolate from 'color-interpolate'
+import {Component, Vue, Watch} from 'vue-property-decorator'
 import rgbHex from "rgb-hex"
-
-//eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-//@ts-ignore
+//noinspection TypeScriptCheckImport
 import ColorPicker from 'vue-iro-color-picker'
+import {randomColor} from "@/utilities"
 
 @Component({
   components: {ColorPicker}
 })
 export default class ColorGradient extends Vue {
 
-  @PropSync('palette') private paletteSync!: string[]
   private showColorNames = false
   private count = 11
-  private paletteObjects: any[] = []
-  private colorMap: any = null
+  private copyOptions = [
+    {name: 'CSS'},
+    {name: 'SCSS'},
+    {name: 'JS'},
+    {name: 'JSON'},
+  ]
 
-  @Watch('palette')
-  onPaletteChanged(oldVal: string[], newVal: string[]) {
-    this.updatePaletteObjects()
+  get palette() {
+    return this.$store.state.palette
+  }
+  set palette(value: string[]) {
+    this.$store.commit('updatePalette', value)
+  }
+  get paletteObjects() {
+    return this.palette.map((color: string) => {
+      return {
+        hex: color
+      }
+    })
   }
 
-
-  randomColor() {
-    return '#' + Math.floor(Math.random() * 16777215).toString(16)
-  }
-
-  addColorToPalette() {
-    this.paletteSync.push(this.randomColor())
-    this.updatePaletteObjects()
-  }
-
-  mounted() {
-    this.updatePaletteObjects()
+  get colorMap() {
+    return this.$store.getters.colorMap
   }
 
   get colors() {
@@ -108,31 +108,17 @@ export default class ColorGradient extends Vue {
     return gradient
   }
 
-  updatePaletteObjects() {
-    this.colorMap = interpolate(this.paletteSync)
-    this.$emit('update:colormap', this.colorMap)
-    this.paletteObjects = this.paletteSync.map((color: string) => {
-      return {
-        hex: color
-      }
-    })
+  onColorChanged(value: any, index: number) {
+    this.$store.commit('updatePaletteColor', {index, color: value.color.hexString})
   }
 
-  onColorChanged(value: any, index: number) {
-    this.paletteSync[index] = value.color.hexString
-    this.updatePaletteObjects()
+  addColorToPalette() {
+    this.palette.push(randomColor())
   }
 
   removeColorAt(index: number) {
-    this.paletteSync.splice(index, 1)
+    this.palette.splice(index, 1)
   }
-
-  private copyOptions = [
-    {name: 'CSS'},
-    {name: 'SCSS'},
-    {name: 'JS'},
-    {name: 'JSON'},
-  ]
 
   translate(value: string) {
     return this.colors.join(',')

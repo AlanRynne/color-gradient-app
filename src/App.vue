@@ -23,7 +23,7 @@
               router-link.has-text-weight-medium.has-text-white(:to="{name: 'About'}") Created by Alan Rynne
       .hero-body
         transition(name="smooth" mode="out-in")
-          router-view(@colormap="onColorMap")
+          router-view
       .hero-foot
         .tabs.is-fullwidth
           .container.is-family-secondary
@@ -45,15 +45,19 @@ function wait(seconds: number) {
 @Component
 export default class App extends Vue {
   private isLoading = true
-  private colorMap = null
+
+  get colorMap() {
+    return this.$store.getters.colorMap
+  }
+
   private circleRange: number[] = []
   private circleCount = 24
 
   async mounted() {
     this.computeCircleCount()
+    window.addEventListener('resize', this.handleResize)
     await wait(300)
     this.isLoading = false
-    window.addEventListener('resize', this.handleResize)
   }
 
   beforeDestroy() {
@@ -62,10 +66,6 @@ export default class App extends Vue {
 
   handleResize() {
     this.computeCircleCount()
-  }
-
-  onColorMap(map: any) {
-    this.colorMap = map
   }
 
   computeCircleCount() {
