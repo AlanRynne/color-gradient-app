@@ -2,13 +2,13 @@
   #app(ref="app")
     .app-bg(v-if="colorMap")
       svg(xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' :style="colorMap ? `background-color:${colorMap(0)}`: ''")
-        g(stroke='#000' stroke-width='50' stroke-opacity='0.07')
+        g(stroke='#000' :stroke-width='strokeWidth' stroke-opacity='0.07')
           circle(
             v-for="i in count"
             :key="i"
             :fill="colorMap ? colorMap(1-(i/(count-1))): '#ffffff'"
-            cx='-150'
-            cy='0'
+            :cx='-400 +Math.sin(time) * 50 * (i%2 == 0 ? 1: -1)'
+            :cy='-400 +Math.cos(time) * 50 * (i%2 == 0 ? 1: -1)'
             :r='((count+2) * 100)-(i+1)*100'
           )
     .change-progress.container
@@ -40,12 +40,14 @@ import {wait} from "@/utilities"
 @Component
 export default class App extends Vue {
   private isLoading = true
-  private changeActive = true
+  private changeActive = false
   private progress = 0
+  private time = 0
   private size = {
     width: window.innerWidth,
     height: window.innerHeight
   }
+  private strokeWidth = 66.7
 
   get colorMap() {
     return this.$store.getters.colorMap
@@ -67,6 +69,15 @@ export default class App extends Vue {
     }
   }
 
+  async animateBackground() {
+    const loopDuration = 5000
+    const step = 10
+    await wait(step)
+    this.time += step / loopDuration
+    this.animateBackground()
+    this.strokeWidth = 66.7 + Math.sin(this.time) * 20
+  }
+
   async runTimer() {
     if (this.changeActive) {
       if (this.progress == 100) {
@@ -78,21 +89,22 @@ export default class App extends Vue {
         this.progress += 2
         await wait(100)
       }
-    }else {
+    } else {
       await wait(500)
     }
     this.runTimer()
   }
 
   get count() {
-    const height = this.size.height
-    const width = this.size.width + 150
+    const height = this.size.height+400
+    const width = this.size.width + 400
     const diagDistance = Math.sqrt(height * height + width * width)
     const count = Math.ceil(diagDistance / 100)
     return count
   }
 
   mounted() {
+    this.animateBackground()
     if (this.changeActive) {
       this.runTimer()
     }
