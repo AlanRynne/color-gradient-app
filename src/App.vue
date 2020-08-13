@@ -105,9 +105,7 @@ export default class App extends Vue {
 
   mounted() {
     this.animateBackground()
-    if (this.changeActive) {
-      this.runTimer()
-    }
+    this.runTimer()
     this.handleResize()
     window.addEventListener('resize', this.handleResize)
     window.addEventListener('mousemove', this.onMouseMove)
