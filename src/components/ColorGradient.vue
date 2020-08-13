@@ -170,7 +170,7 @@ export default class ColorGradient extends Vue {
 
 .color-box {
   position: relative;
-  transition: background-color .1s;
+  transition: background-color .5s;
   display: flex;
   justify-content: center;
   align-items: center;

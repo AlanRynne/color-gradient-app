@@ -1,26 +1,26 @@
 <template lang="pug">
   #app(ref="app")
-    b-loading(:active="isLoading")
     .app-bg(v-if="colorMap")
       svg(xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' :style="colorMap ? `background-color:${colorMap(0)}`: ''")
-        g(stroke='#000' stroke-width='66.7' stroke-opacity='0.07')
+        g(stroke='#000' stroke-width='50' stroke-opacity='0.07')
           circle(
-            v-for="i in circleRange"
+            v-for="i in count"
             :key="i"
-            :fill="colorMap ? colorMap(1-(i/(circleCount-1))): '#ffffff'"
+            :fill="colorMap ? colorMap(1-(i/(count-1))): '#ffffff'"
             cx='-150'
             cy='0'
-            :r='((circleCount+2) * 100)-(i+1)*100'
+            :r='((count+2) * 100)-(i+1)*100'
           )
+    .change-progress.container
+      b-progress(:value="progress" type="is-white" size="is-small" :style="{'--anime-delay':'0s', '--anime-duration':'0s' }")
+      b-icon.pause-button.has-text-white(:icon="changeActive ? 'pause-circle': 'play-circle'" size="is-small" type="is-text" @click.native="toggleTimer")
     .hero.is-primary.is-transparent.is-fullheight
       .hero-head.is-family-secondary
-        b-navbar(wrapper-class="container" :mobile-burger="false" spaced)
+        b-navbar(wrapper-class="container" :mobile-burger="false" transparent)
           template(slot="start" class="start")
-            b-navbar-item(tag="p")
-              router-link.has-text-weight-bold.has-text-white(:to="{name:'Home'}") Quick color gradients
+            b-navbar-item(tag="router-link" :to="{name: 'Home'}") Color map creator
           template(slot="end" class="end")
-            b-navbar-item(tag="p")
-              router-link.has-text-weight-medium.has-text-white(:to="{name: 'About'}") Created by Alan Rynne
+            b-navbar-item(tag="router-link" :to="{name: 'About'}") About the author
       .hero-body
         transition(name="smooth" mode="out-in")
           router-view
@@ -34,59 +34,94 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator'
-
-function wait(seconds: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, seconds)
-  })
-}
+import {Component, Ref, Vue} from 'vue-property-decorator'
+import {wait} from "@/utilities"
 
 @Component
 export default class App extends Vue {
   private isLoading = true
+  private changeActive = true
+  private progress = 0
+  private size = {
+    width: window.innerWidth,
+    height: window.innerHeight
+  }
 
   get colorMap() {
     return this.$store.getters.colorMap
   }
 
-  private circleRange: number[] = []
-  private circleCount = 24
+  toggleTimer() {
+    this.changeActive = !this.changeActive
+    if (this.changeActive) {
+      this.$buefy.snackbar.open({
+        message: 'Starting auto generate',
+        queue: false
+      })
+    } else {
+      this.$buefy.snackbar.open({
+        message: 'Stopped auto generate',
+        queue: false,
+        type: "is-danger"
+      })
+    }
+  }
 
-  async mounted() {
-    this.computeCircleCount()
+  async runTimer() {
+    if (this.changeActive) {
+      if (this.progress == 100) {
+        await wait(300)
+        this.progress = 0
+        this.$store.commit('randomizePalette')
+        await wait(1000)
+      } else {
+        this.progress += 2
+        await wait(100)
+      }
+    }else {
+      await wait(500)
+    }
+    this.runTimer()
+  }
+
+  get count() {
+    const height = this.size.height
+    const width = this.size.width + 150
+    const diagDistance = Math.sqrt(height * height + width * width)
+    const count = Math.ceil(diagDistance / 100)
+    return count
+  }
+
+  mounted() {
+    if (this.changeActive) {
+      this.runTimer()
+    }
+    this.handleResize()
     window.addEventListener('resize', this.handleResize)
-    await wait(300)
-    this.isLoading = false
+    window.addEventListener('mousemove', this.onMouseMove)
+    wait(300).then(() => {
+      this.isLoading = false
+    })
   }
 
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('mousemove', this.onMouseMove)
   }
 
   handleResize() {
-    this.computeCircleCount()
-  }
-
-  computeCircleCount() {
-    const cnt = this.$refs.app as HTMLElement
-    if (!cnt) return 25
-    const height = cnt.clientHeight
-    const width = cnt.clientWidth + 150
-    const diagDistance = Math.sqrt(height * height + width * width)
-    const count = Math.ceil(diagDistance / 100)
-    this.circleRange = this.range(0, count)
-    this.circleCount = count
-  }
-
-  range(lowEnd: number, highEnd: number) {
-    const list = []
-    for (let i = lowEnd; i <= highEnd; i++) {
-      list.push(i)
+    this.size = {
+      width: this.$el.clientWidth,
+      height: this.$el.clientHeight
     }
-    return list
   }
 
+  onMouseMove(e: MouseEvent) {
+    this.$store.commit('updateMousePosition', {
+      x: (e.pageX / window.innerWidth) - 0.5,
+      y: (e.pageY / window.innerHeight)
+    })
+  }
 }
 </script>
 
@@ -103,10 +138,36 @@ export default class App extends Vue {
     width: 100%;
     height: 100%;
     z-index: 0;
+
+    circle {
+      transition: fill 1s;
+    }
   }
 
   .hero.is-transparent {
     background: transparent !important;
+  }
+}
+
+.change-progress {
+  position: absolute;
+  display: flex;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  width: 15rem;
+  margin: 0.75rem;
+  align-items: center;
+  justify-content: center;
+
+  .progress-wrapper {
+    flex-basis: 100% !important;
+    margin-bottom: 0 !important;
+    margin-right: 1rem !important;
+
+    progress.progress {
+      height: 0.4rem;
+    }
   }
 }
 
@@ -125,5 +186,40 @@ export default class App extends Vue {
 .button:focus:not(.active) {
   outline: none !important;
   box-shadow: none !important;
+}
+
+.has-text-shadow {
+  $shadow: 0px;
+  @if (var(--shadow-dir)) {
+    $shadow: var(--shadow-dir)
+  }
+  text-shadow: $shadow 1px 1px rgba(0, 0, 0, 0.11),
+  $shadow 2px 2px rgba(0, 0, 0, 0.11),
+  $shadow 4px 4px rgba(0, 0, 0, 0.11),
+  $shadow 8px 8px rgba(0, 0, 0, 0.11),
+  $shadow 16px 16px rgba(0, 0, 0, 0.11),
+  $shadow 32px 32px rgba(0, 0, 0, 0.11);
+}
+
+.navbar.is-dark .navbar-end > a.navbar-item:hover {
+  background-color: rgba(black, 0.5);
+}
+
+.navbar.is-dark .navbar-end > a.navbar-item:focus {
+  background-color: rgba(black, 0.5);
+}
+
+.router-link-exact-active {
+  font-weight: bold !important;
+  color: white !important;
+  transition: color 1s;
+}
+
+.pause-button {
+  &:hover {
+    transform: scale(1.1);
+    transform-origin: center;
+    transition: transform .3s;
+  }
 }
 </style>

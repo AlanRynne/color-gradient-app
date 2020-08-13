@@ -29,6 +29,8 @@ $colors: (
 
 );
 
+$snackbar-background-color: $light;
+$snackbar-color: $light-invert;
 // Links
 $link: $primary;
 $link-focus-border: $primary;
@@ -44,10 +46,10 @@ $loading-background-legacy: white;
 @import "~animate.css";
 
 .smooth-enter-active {
-  animation: fadeIn .3s;
+  animation: fadeIn .3s ease-out;
 }
 
 .smooth-leave-active {
-  animation: fadeOut .3s;
+  animation: fadeOut .3s ease-in;
 }
 

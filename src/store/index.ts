@@ -7,7 +7,11 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        palette: [randomColor(), randomColor()]
+        palette: [randomColor(), randomColor()],
+        mousePosition: {
+            x: 0,
+            y: 0
+        }
     },
     getters: {
         colorMap: state => interpolate(state.palette)
@@ -23,6 +27,9 @@ export default new Vuex.Store({
         },
         randomizePalette(state) {
             state.palette = randomColorPalette()
+        },
+        updateMousePosition(state, pos){
+            state.mousePosition = pos
         }
     },
     actions: {},
