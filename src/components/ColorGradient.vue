@@ -62,7 +62,10 @@
 <script lang="ts">
 import {Component, Vue, Watch} from 'vue-property-decorator'
 import rgbHex from "rgb-hex"
-//noinspection TypeScriptCheckImport
+
+
+//eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+//@ts-ignore
 import ColorPicker from 'vue-iro-color-picker'
 import {randomColor} from "@/utilities"
 
